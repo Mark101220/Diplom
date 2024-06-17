@@ -1,0 +1,9 @@
+@import '~/assets/styles/variables.scss';
+
+.link {
+    color: $secondary300;
+
+    &:hover {
+        color: $primary300;
+    }
+}

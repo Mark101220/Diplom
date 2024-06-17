@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id             Int              @id @unique(map: "id") @default(autoincrement())
+  name           String?          @db.Text
+  gost           String?          @db.Text
+  description    String?          @db.Text
+  Product_detail Product_detail[]
+}
+
+model Product_detail {
+  id         Int      @id @unique(map: "id") @default(autoincrement())
+  product_id Int?
+  name       String?  @db.Text
+  length     String?  @db.Text
+  weight     String?  @db.Text
+  price      String?  @db.Text
+  amount     String?  @db.Text
+  Product    Product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_detail_ibfk_1")
+
+  @@index([product_id], map: "product_id")
+}
+
+model Product_photo {
+  id         Int     @id @unique(map: "id") @default(autoincrement())
+  product_id Int?
+  photo      String? @db.Text
+
+  @@index([product_id], map: "product_id")
+}
+
+model Shipment_product {
+  id             Int       @id @unique(map: "id") @default(autoincrement())
+  shipment_id    Int?
+  product_id     Int?
+  amount         Int?
+  price_per_unit Int?
+  shipment       shipment? @relation(fields: [shipment_id], references: [id],  map: "shipment_product_ibfk_1")
+
+  @@index([product_id], map: "product_id")
+  @@index([shipment_id], map: "shipment_id")
+}
+
+model Status {
+  id     Int     @id @unique(map: "id") @default(autoincrement())
+  status String? @db.Text
+}
+
+model User {
+  id              Int             @id @unique(map: "id") @default(autoincrement())
+  name            String?         @db.Text
+  second_name     String?         @db.Text
+  phone           String?         @db.Text
+  mail            String?         @unique
+  is_admin        Boolean?        @default(false)
+  RefreshToken    RefreshToken[]
+}
+
+model User_address {
+  id      Int     @id @unique(map: "id") @default(autoincrement())
+  user_id Int?
+  address String? @db.Text
+
+  @@index([user_id], map: "user_id")
+}
+
+model shipment {
+  id               Int                @id @unique(map: "id") @default(autoincrement())
+  user_id          Int?
+  status_id        Int?
+  datetime         DateTime?          @db.DateTime(0)
+  cheque           String?            @db.Text
+  Shipment_product Shipment_product[]
+
+  @@index([status_id], map: "status_id")
+}
+
+model RefreshToken {
+  id           Int                @id @unique(map: "id") @default(autoincrement())
+  token        String             @unique
+  createdAt    DateTime           @default(now())
+  updateAt     DateTime           @updatedAt
+  user_id      Int               
+  User         User               @relation(fields: [user_id], references: [id])
+}
