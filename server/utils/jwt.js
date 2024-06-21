@@ -1,4 +1,6 @@
 import jwt from 'jsonwebtoken';
+import { setCookie } from 'h3';
+
 
 const generateAccessToken = (user) => {
     const config = useRuntimeConfig()
@@ -16,6 +18,26 @@ const generateRefreshToken = (user) => {
     })
 }
 
+export const decodeRefreshToken = (token) => {
+    const config = useRuntimeConfig()
+
+    try {
+        return jwt.verify(token, config.jwtRefreshSecret)
+    } catch (error) {
+        return null
+    }
+}
+
+export const decodeAccessToken = (token) => {
+    const config = useRuntimeConfig()
+
+    try {
+        return jwt.verify(token, config.jwtAccessSecret)
+    } catch (error) {
+        return null
+    }
+}
+
 export const generateTokens = (user) => {
     const accessToken = generateAccessToken(user)
     const refreshToken = generateRefreshToken(user)
@@ -25,6 +47,9 @@ export const generateTokens = (user) => {
     }
 }
 
-export const sendRefreshToken = (event) => {
-    setCookie(event.res)
+export const sendRefreshToken = (event, token) => {
+    setCookie(event, "refresh_token", token, {
+        httpOnly: true,
+        sameSite: true
+    })
 }

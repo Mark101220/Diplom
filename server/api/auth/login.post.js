@@ -1,6 +1,7 @@
 import { createRefreshToken } from "~/server/db/refreshTokens";
 import { getUserByMailAndPhone } from "~/server/db/users";
 import { generateTokens, sendRefreshToken } from "~/server/utils/jwt";
+import { sendError } from "h3";
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -34,8 +35,9 @@ export default defineEventHandler(async (event) => {
         token: refreshToken,
         user_id: user.id
     }) 
+
     // Add http only cookie
-    sendRefreshToken(event)
+    sendRefreshToken(event , refreshToken)
 
     return {
         access_token: accessToken, 
